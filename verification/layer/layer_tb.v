@@ -3,7 +3,7 @@
 module layer_tb;
 
     // Parameters
-    parameter dataWidth = 16;
+    parameter dataWidth = 8;
     parameter W = 9'h01C;
     parameter K = 9'h003;
     parameter P = 9'h002;
@@ -55,6 +55,7 @@ module layer_tb;
     integer i, j;
     reg [dataWidth-1:0] input_data [0:W*W-1];  // 6x6 input
     reg [dataWidth-1:0] kernel_data [0:K*K-1]; // 3x3 kernel
+    reg [dataWidth-1:0] pooling_out_data [0:((W-K+1)/2)*((W-K+1)/2)-1]; // Pooling output data
 
     // Test sequence
     initial begin
@@ -68,6 +69,7 @@ module layer_tb;
         // Read input file
         $readmemb("../../python/input.txt", input_data);  // Load binary input values
         $readmemb("../../python/kernel.txt", kernel_data); // Load binary kernel values
+        $readmemb("../../python/pooling_output.txt", pooling_out_data); // Load pooling output values
 
         // Map kernel data to weight
         weight = 0;
@@ -95,10 +97,19 @@ module layer_tb;
         $dumpvars(0, layer_tb);
     end
 
-    // Monitor output
+    // Monitor output and compare with pooling_out
+    integer pass_count = 0;
     always @(posedge clk) begin
         if (valid_op == 1 && end_op == 0) begin
-            $display("Time: %0t, Data_out: %b", $time, data_out);
+            // Compare data_out with pooling_out_data
+            if (pass_count < ((W-K+1)/2)*((W-K+1)/2)) begin
+                if (data_out == pooling_out_data[pass_count]) begin
+                    $display("Test Passed for output %d: %b", pass_count, data_out);
+                end else begin
+                    $display("Test Failed for output %d: expected %b, got %b", pass_count, pooling_out_data[pass_count], data_out);
+                end
+                pass_count = pass_count + 1; // Move to next expected output
+            end
         end
     end
 
