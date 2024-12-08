@@ -14,8 +14,8 @@ module shift_register #(
     generate
         genvar l;
         for (l = 0; l < size; l = l + 1) begin
-            always @(posedge clk or negedge rst) begin
-                if (!rst) begin
+            always @(posedge clk) begin
+                if (rst) begin
                     tmp[l] <= 'd0;
                 end
                 else if (ce) begin

@@ -20,8 +20,8 @@ module control_logic2 #(
     integer nbgh_row_count = 0;   
 
     // Always block for control signals
-    always @(posedge clk or negedge master_rst) begin
-        if (!master_rst) begin
+    always @(posedge clk) begin
+        if (master_rst) begin
             sel <= 2'b00;
             load_sr <= 0;
             rst_m <= 0;
@@ -48,9 +48,9 @@ module control_logic2 #(
                 // Reset the entire module when the last column and row are reached
                 if (((col_count + 1) % P != 0) && (col_count == M - 2) && 
                     (row_count == P - 1)) begin
-                    global_rst <= 0;
-                end else begin
                     global_rst <= 1;
+                end else begin
+                    global_rst <= 0;
                 end
 
                 // Case 3: Reset max register at the end of the neighbourhood
@@ -87,14 +87,14 @@ module control_logic2 #(
     end
 
     // Always block for counters
-    always @(posedge clk or negedge master_rst) begin
-        if (!master_rst) begin
+    always @(posedge clk) begin
+        if (master_rst) begin
             row_count <= 0;
             col_count <= 32'hffffffff;
             count <= 32'hffffffff;
             nbgh_row_count <= 0;
         end else if (ce) begin
-            if (!global_rst) begin
+            if (global_rst) begin
                 row_count <= 0;
                 col_count <= 0;
                 count <= 0;

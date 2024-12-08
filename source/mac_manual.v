@@ -10,8 +10,8 @@ module mac_manual #(
     input [dataWidth-1:0] tmp,
     output reg [dataWidth-1:0] data_out
 ); 
-    always @(posedge clk or negedge rst) begin
-        if(!rst) begin
+    always @(posedge clk) begin
+        if(rst) begin
             data_out <= 0;
         end
         else begin

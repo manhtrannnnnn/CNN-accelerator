@@ -87,8 +87,8 @@ module convolver #(
     reg [$clog2(W*W):0] cycle_counter = 0;
 
     // Logic to control row and column counters
-    always @(posedge clk or negedge global_rst) begin
-        if (!global_rst) begin
+    always @(posedge clk) begin
+        if (global_rst) begin
             row_counter <= 0;
             col_counter <= 0;
             cycle_counter <= 0;
@@ -108,8 +108,8 @@ module convolver #(
     end
 
     // Generate `valid_conv` when at a valid convolution window
-    always @(posedge clk or negedge global_rst) begin
-        if (!global_rst) begin
+    always @(posedge clk) begin
+        if (global_rst) begin
             valid_conv <= 0;
         end else if (ce) begin
             if ((row_counter >= K-1 && row_counter < W && (row_counter - (K-1)) % s == 0) &&
@@ -122,8 +122,8 @@ module convolver #(
     end
 
     // Generate `end_conv` when the entire convolution is complete
-    always @(posedge clk or negedge global_rst) begin
-        if (!global_rst) begin
+    always @(posedge clk) begin
+        if (global_rst) begin
             end_conv <= 0;
         end else if (ce && cycle_counter >= W*W) begin
             end_conv <= 1;

@@ -8,9 +8,9 @@ module max_reg #(parameter N = 16) (
     output reg [N-1:0] reg_op
     );
 
-    always@(posedge clk or negedge master_rst) 
+    always@(posedge clk) 
     begin
-    	if(!master_rst)
+    	if(master_rst)
     		reg_op <= 0;
     	else 
         begin
