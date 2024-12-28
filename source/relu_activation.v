@@ -1,11 +1,10 @@
 `timescale 1ns/1ps
-`include "defines.v"
 
 module relu_activation #(
-    parameter dataWidth = 16
+    parameter DATA_WIDTH = 16
 )(
-    input [dataWidth-1:0] data_in,
-    output [dataWidth-1:0] data_out
+    input [DATA_WIDTH-1:0] data_in,
+    output [DATA_WIDTH-1:0] data_out
 );
-    assign data_out = (data_in[dataWidth-1] == 1) ? 0 : data_in;
+    assign data_out = (data_in[DATA_WIDTH-1] == 1) ? 0 : data_in;
 endmodule

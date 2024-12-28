@@ -1,7 +1,7 @@
 import numpy as np
 
 # Parameters
-input_size = 124  # Size of input feature map
+input_size = 8  # Size of input feature map
 kernel_size = 3  # Size of kernel
 pool_size = 2    # Size of pooling window
 stride = 1       # Stride for convolution

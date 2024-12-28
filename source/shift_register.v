@@ -1,15 +1,14 @@
 `timescale 1ns/1ps
-`include "defines.v"
 
 module shift_register #(
-    parameter dataWidth = 16,
+    parameter DATA_WIDTH = 16,
     parameter size = 3
 )(
     input clk, ce, rst,
-    input [dataWidth-1:0] data_in,
-    output [dataWidth-1:0] data_out
+    input [DATA_WIDTH-1:0] data_in,
+    output [DATA_WIDTH-1:0] data_out
 );
-    reg [dataWidth-1:0] tmp[size-1:0];
+    reg [DATA_WIDTH-1:0] tmp[size-1:0];
     
     generate
         genvar l;

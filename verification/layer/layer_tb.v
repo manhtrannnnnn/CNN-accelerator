@@ -1,39 +1,40 @@
 `timescale 1ns / 1ps
-`include "defines.v"
-
+`include "../../source/defines.vh"
 module layer_tb;
 
     // Parameters
-    parameter dataWidth = 8;
-    parameter W = 124;
-    parameter K = 3;
-    parameter P = 2;
-    parameter s = 1;
-    parameter actype = 1'b1;  // 0 => tanh, 1 => relu
+    parameter DATA_WIDTH = `DATA_WIDTH;
+    parameter INPUT_SIZE = `INPUT_SIZE;
+    parameter KERNEL_SIZE = `KERNEL_SIZE;
+    parameter POOL_SIZE = `POOL_SIZE;
+    parameter STRIDE = `STRIDE;
+    parameter ACTIVATION_TYPE = `ACTIVATION_TYPE;  // 0 => tanh, 1 => relu
+    parameter POOL_TYPE = `POOL_TYPE;       // 0 => average pooling, 1 => max pooling
 
     // Inputs
     reg clk;
     reg global_rst;
     reg ce;
-    reg [dataWidth-1:0] myInput;
-    reg [K*K*dataWidth-1:0] weight;
-    reg [dataWidth-1:0] bias;
-    reg [dataWidth-1:0] act_op;
+    reg [DATA_WIDTH-1:0] myInput;
+    reg [KERNEL_SIZE*KERNEL_SIZE*DATA_WIDTH-1:0] weight;
+    reg [DATA_WIDTH-1:0] bias;
+    reg [DATA_WIDTH-1:0] act_op;
     reg valid_pooling;
 
     // Outputs
-    wire [dataWidth-1:0] data_out;
+    wire [DATA_WIDTH-1:0] data_out;
     wire valid_op;
     wire end_op;
 
     // Instantiate the Unit Under Test (UUT)
     layer #(
-        .dataWidth(dataWidth),
-        .W(W),
-        .K(K),
-        .P(P),
-        .s(s),
-        .actype(actype)
+        .DATA_WIDTH(DATA_WIDTH),
+        .INPUT_SIZE(INPUT_SIZE),
+        .KERNEL_SIZE(KERNEL_SIZE),
+        .POOL_SIZE(POOL_SIZE),
+        .STRIDE(STRIDE),
+        .ACTIVATION_TYPE(ACTIVATION_TYPE),
+        .POOL_TYPE(POOL_TYPE)
     ) uut (
         .clk(clk),
         .global_rst(global_rst),
@@ -56,9 +57,9 @@ module layer_tb;
     end
 
     integer i;
-    reg [dataWidth-1:0] input_data [0:W*W-1];  // Input matrix
-    reg [dataWidth-1:0] kernel_data [0:K*K-1]; // Kernel weights
-    reg [dataWidth-1:0] pooling_out_data [0:((W-K+1)/2)*((W-K+1)/2)-1]; // Expected pooling outputs
+    reg [DATA_WIDTH-1:0] input_data [0:INPUT_SIZE*INPUT_SIZE-1];  // Input matrix
+    reg [DATA_WIDTH-1:0] kernel_data [0:KERNEL_SIZE*KERNEL_SIZE-1]; // Kernel weights
+    reg [DATA_WIDTH-1:0] pooling_out_data [0:((INPUT_SIZE-KERNEL_SIZE+1)/2)*((INPUT_SIZE-KERNEL_SIZE+1)/2)-1]; // Expected pooling outputs
 
     integer pass_count = 0;   // Count of passed tests
     integer fail_count = 0;   // Count of failed tests
@@ -81,8 +82,8 @@ module layer_tb;
 
         // Map kernel data to weight
         weight = 0;
-        for (i = 0; i < K*K; i = i + 1) begin
-            weight = weight | (kernel_data[i] << (i * dataWidth));
+        for (i = 0; i < KERNEL_SIZE*KERNEL_SIZE; i = i + 1) begin
+            weight = weight | (kernel_data[i] << (i * DATA_WIDTH));
         end
 
         // Wait for global reset to finish
@@ -91,7 +92,7 @@ module layer_tb;
         ce = 1;
 
         // Provide input values sequentially
-        for (i = 0; i < W*W; i = i + 1) begin
+        for (i = 0; i < INPUT_SIZE*INPUT_SIZE; i = i + 1) begin
             myInput = input_data[i];
             #(clkp); 
         end
@@ -110,7 +111,7 @@ module layer_tb;
     // Monitor output and compare with expected values
     always @(posedge clk) begin
         if (valid_op == 1 && end_op == 0) begin
-            if (test_index < ((W-K+1)/2)*((W-K+1)/2)) begin
+            if (test_index < ((INPUT_SIZE-KERNEL_SIZE+1)/2)*((INPUT_SIZE-KERNEL_SIZE+1)/2)) begin
                 total_tests = total_tests + 1;
                 if (data_out == pooling_out_data[test_index]) begin
                     $display("Test Passed for output %d: got %b", test_index, data_out);

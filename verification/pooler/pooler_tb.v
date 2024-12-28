@@ -1,12 +1,11 @@
 `timescale 1ns/1ps
-`include "defines.v"
 module pooler_tb;
 
     // Parameters
-    parameter M = 28;                  // Input matrix size (rows/columns)
-    parameter P = 2;                  // Pooling window size
-    parameter dataWidth = 8;              // Data width for inputs/outputs
-    parameter ptype = 1;                   // Pooling type: 0 -> Average, 1 -> Max
+    parameter INPUT_SIZE = 26;              // Input matrix size (rows/columns)
+    parameter POOL_SIZE = 2;                // Pooling window size
+    parameter DATA_WIDTH = 8;               // Data width for inputs/outputs
+    parameter POOL_TYPE = 1;                // Pooling type: 0 -> Average, 1 -> Max
 
     // Clock and reset signals
     reg clk;
@@ -14,24 +13,24 @@ module pooler_tb;
     reg master_rst;
 
     // Input and output signals
-    reg [dataWidth-1:0] data_in;
-    wire [dataWidth-1:0] data_out;
+    reg [DATA_WIDTH-1:0] data_in;
+    wire [DATA_WIDTH-1:0] data_out;
     wire valid_op;
     wire end_op;
 
     // Memory for input and expected output data
-    reg [dataWidth-1:0] input_data [0:M*M-1];          // Assuming M x M matrix for input
-    reg [dataWidth-1:0] pooling_out_data [0:(M/P)*(M/P)-1]; // Expected output data
+    reg [DATA_WIDTH-1:0] input_data [0:INPUT_SIZE*INPUT_SIZE-1];          // Assuming INPUT_SIZE x INPUT_SIZE matrix for input
+    reg [DATA_WIDTH-1:0] pooling_out_data [0:(INPUT_SIZE/POOL_SIZE)*(INPUT_SIZE/POOL_SIZE)-1]; // Expected output data
     integer pass_count = 0;
     integer fail_count = 0;
     integer i;
 
     // Instantiate the pooler module
     pooler #(
-        .M(M),
-        .P(P),
-        .dataWidth(dataWidth),
-        .ptype(ptype)
+        .INPUT_SIZE(INPUT_SIZE),
+        .POOL_SIZE(POOL_SIZE),
+        .DATA_WIDTH(DATA_WIDTH),
+        .POOL_TYPE(POOL_TYPE)
     ) uut (
         .clk(clk),
         .ce(ce),
@@ -64,7 +63,7 @@ module pooler_tb;
         ce = 1;
 
         // Feed input data to the module
-        for (i = 0; i < M * M; i = i + 1) begin
+        for (i = 0; i < INPUT_SIZE * INPUT_SIZE; i = i + 1) begin
             data_in = input_data[i];
             #10; // Wait for one clock cycle
         end
@@ -89,7 +88,7 @@ module pooler_tb;
     always @(posedge clk) begin
         if (valid_op == 1 && end_op == 0) begin
             // Compare data_out with pooling_out_data
-            if (pass_count < (M/P) * (M/P)) begin
+            if (pass_count < (INPUT_SIZE/POOL_SIZE) * (INPUT_SIZE/POOL_SIZE)) begin
                 if (data_out == pooling_out_data[pass_count]) begin
                     $display("Test Passed for output %d: %b", pass_count, data_out);
                     pass_count = pass_count + 1;

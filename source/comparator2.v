@@ -1,20 +1,20 @@
 `timescale 1ns / 1ps
 
 module comparator2 #(
-    parameter dataWidth = 16,
-    parameter ptype = 1
+    parameter DATA_WIDTH = 16,
+    parameter POOL_TYPE = 1
     )(
     input ce,
-    input [dataWidth-1:0] in1,
-    input [dataWidth-1:0] in2,
-    output [dataWidth-1:0] comp_op
+    input [DATA_WIDTH-1:0] in1,
+    input [DATA_WIDTH-1:0] in2,
+    output [DATA_WIDTH-1:0] comp_op
     ); 
-    reg [dataWidth-1:0] temp;
+    reg [DATA_WIDTH-1:0] temp;
     assign comp_op = ce ? temp : 'd0;
 
     always@(*)
     begin
-        if(ptype == 0)
+        if(POOL_TYPE == 0)
         begin
             temp = in1 + in2;        
         end
