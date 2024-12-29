@@ -6,7 +6,7 @@
 `define DATA_WIDTH      8   // Width of data path in bits
 
 // Network architecture parameters
-`define INPUT_SIZE      124   // Input image width/height
+`define INPUT_SIZE      28   // Input image width/height
 `define KERNEL_SIZE     3   // Convolution kernel size
 `define PADDING         0   // Padding size
 `define STRIDE          1   // Stride value for convolution
